@@ -62,7 +62,7 @@ class quaternion
 		//! Add operator
 		quaternion operator+(const quaternion<T>& other) const;
 
-		//! Multiplication operator
+		//! Multiplication operator ()
 		quaternion operator*(const quaternion<T>& other) const;
 
 		//! Multiplication operator with scalar
@@ -74,7 +74,7 @@ class quaternion
 		//! Multiplication operator
 		vector3<T> operator*(const vector3<T>& v) const;
 
-		//! Multiplication operator
+		//! Multiplication operator XXX(maxhe): changed to right side first.
 		quaternion<T>& operator*=(const quaternion<T>& other);
 
 		//! Calculates the dot product
@@ -298,17 +298,16 @@ inline quaternion<T>& quaternion<T>::operator=(const matrix4& m)
 #endif
 
 
-// multiplication operator
+// multiplication operator (right side first)
 template <class T>
 inline quaternion<T> quaternion<T>::operator*(const quaternion<T>& other) const
 {
 	quaternion tmp;
 
-	tmp.W = (other.W * W) - (other.X * X) - (other.Y * Y) - (other.Z * Z);
-	tmp.X = (other.W * X) + (other.X * W) + (other.Y * Z) - (other.Z * Y);
-	tmp.Y = (other.W * Y) + (other.Y * W) + (other.Z * X) - (other.X * Z);
-	tmp.Z = (other.W * Z) + (other.Z * W) + (other.X * Y) - (other.Y * X);
-
+	tmp.X = (W * other.X) + (X * other.W) + (Y * other.Z) - (Z * other.Y);
+	tmp.Y = (W * other.Y) + (Y * other.W) + (Z * other.X) - (X * other.Z);
+	tmp.Z = (W * other.Z) + (Z * other.W) + (X * other.Y) - (Y * other.X);
+	tmp.W = (W * other.W) - (X * other.X) - (Y * other.Y) - (Z * other.Z);
 	return tmp;
 }
 
@@ -722,8 +721,10 @@ inline core::quaternion<T>& quaternion<T>::rotationFromTo(const vector3<T>& from
 	return set(c.X, c.Y, c.Z, s * 0.5f).normalize();
 }
 
-    typedef quaternion<f32> Quatf;
-    typedef quaternion<f64> Quatd;
+    template <class T>
+    using Quat = quaternion<T>;
+    typedef Quat<f32> Quatf;
+    typedef Quat<f64> Quatd;
     
 
 } // end namespace core
